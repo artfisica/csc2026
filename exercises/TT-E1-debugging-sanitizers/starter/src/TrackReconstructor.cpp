@@ -41,13 +41,22 @@ std::vector<Track> TrackReconstructor::reconstruct() {
 // BUG 3: Use-After-Free
 // Return a pointer to memory that has already been freed.
 const Track* TrackReconstructor::getBestTrack() const {
-    auto* best = new Track{};
-    best->pt = 100.0;
-    best->hits = m_hits;
+    // using new creates in the heap and it needs to be deleted manually
+    //auto* best = new Track{};
 
-    delete best;   // freed here
-    return best;   // ERROR: returning freed pointer
+    // 0112_2355-fix, changed to static to extend lifetime
+    static Track best{}; // static extends lifetime to program duration
+
+    best.pt = 100.0;
+    best.hits = m_hits;
+
+    // delete best;   // freed here, but we can't because we need it
+    // return best;   // ERROR: returning freed pointer
+
+    return &best; // why &: return address of static object
 }
 
 } // namespace tt_e1
+
+
 
