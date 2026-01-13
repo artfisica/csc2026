@@ -15,9 +15,10 @@ std::vector<Track> TrackReconstructor::reconstruct() {
     // Allocate a temporary buffer and forget to delete it.
     Hit* hitBuffer = new Hit[m_hits.size()];
 
+    // 0112_1835-bug identified by sanitizer
     // BUG 2: Heap Buffer Overflow
     // Off-by-one error: i <= size() writes one element past the allocation.
-    for (size_t i = 0; i <= m_hits.size(); ++i) {
+    for (size_t i = 0; i < m_hits.size(); ++i) {
         hitBuffer[i] = m_hits[i];
     }
 
@@ -30,6 +31,9 @@ std::vector<Track> TrackReconstructor::reconstruct() {
     }
 
     // Missing: delete[] hitBuffer;
+    
+    // 0112_1844 fix, deleting hitBuffer to prevent memory leak
+    delete[] hitBuffer;
 
     return tracks;
 }
