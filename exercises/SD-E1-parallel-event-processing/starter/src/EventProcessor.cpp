@@ -24,17 +24,16 @@ void EventProcessor::processEvent(const Event& event) {
 }
 
 void EventProcessor::processEvents(const std::vector<Event>& events) {
-    // Intentionally incorrect: race conditions + false sharing
     int tracks = 0;
     double energy = 0.0;
 
 #ifdef CSC2026_USE_OPENMP
-#pragma omp parallel for
+#pragma omp parallel for reduction(+:tracks, energy)
 #endif
     for (size_t i = 0; i < events.size(); ++i) {
         for (const auto& particle : events[i].particles) {
             // Race condition: shared variables updated by multiple threads
-            tracks++;
+            tracks += 1;
             energy += particle.energy();
         }
     }
