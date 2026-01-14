@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(ENABLE_OPENMP "Enable OpenMP parallelism" OFF)
+# incorporating TSAN
+option(ENABLE_TSAN "Enable ThreadSanitizer" OFF)
 
 # Warnings
 if(NOT MSVC)
@@ -57,5 +59,14 @@ if(BUILD_TESTING)
   if(ENABLE_OPENMP)
     set_tests_properties(sd_e1_tests PROPERTIES ENVIRONMENT "OMP_NUM_THREADS=4")
   endif()
+
+
+  if(ENABLE_TSAN)
+    message(STATUS "Sanitizers: Thread")
+    add_compile_options(-fsanitize=thread -fno-omit-frame-pointer -g)
+    add_link_options(-fsanitize=thread)
+  endif()
+
+
 endif()
 
