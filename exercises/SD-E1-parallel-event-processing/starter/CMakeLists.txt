@@ -34,18 +34,28 @@ target_link_libraries(event_processor PRIVATE sd_e1_core)
 include(CTest)
 
 if(BUILD_TESTING)
-  include(FetchContent)
-  FetchContent_Declare(
-    Catch2
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG v3.5.3
-  )
-  FetchContent_MakeAvailable(Catch2)
+  # Prefer a system install if available (helps in offline environments)
+  find_package(Catch2 3 QUIET)
+
+  if(NOT Catch2_FOUND)
+    include(FetchContent)
+    FetchContent_Declare(
+      Catch2
+      GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+      GIT_TAG v3.5.3
+    )
+    FetchContent_MakeAvailable(Catch2)
+  endif()
 
   add_executable(test_sd_e1
     tests/test_event_processor.cpp
   )
   target_link_libraries(test_sd_e1 PRIVATE sd_e1_core Catch2::Catch2WithMain)
   add_test(NAME sd_e1_tests COMMAND test_sd_e1)
+
+  # Make races reproducible: ensure we run with >1 thread under ctest
+  if(ENABLE_OPENMP)
+    set_tests_properties(sd_e1_tests PROPERTIES ENVIRONMENT "OMP_NUM_THREADS=4")
+  endif()
 endif()
 

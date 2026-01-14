@@ -15,7 +15,7 @@ static void BM_AoS_SumEnergy(benchmark::State& state) {
     }
 
     for (auto _ : state) {
-        const double sum = data.sumEnergy();
+        double sum = data.sumEnergy();
         benchmark::DoNotOptimize(sum);
     }
 }
@@ -34,7 +34,7 @@ static void BM_SoA_SumEnergy(benchmark::State& state) {
     }
 
     for (auto _ : state) {
-        const double sum = data.sumEnergy();
+        double sum = data.sumEnergy();
         benchmark::DoNotOptimize(sum);
     }
 }

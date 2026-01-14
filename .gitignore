@@ -32,3 +32,4 @@ data/sample.root
 
 # MacOS
 .DS_Store
+.patch

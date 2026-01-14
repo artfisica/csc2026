@@ -73,13 +73,18 @@ target_link_libraries(analyze PRIVATE tt_e1_core)
 include(CTest)
 
 if(BUILD_TESTING)
-  include(FetchContent)
-  FetchContent_Declare(
-    Catch2
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG v3.5.3
-  )
-  FetchContent_MakeAvailable(Catch2)
+  # Prefer a system install if available (helps in offline environments)
+  find_package(Catch2 3 QUIET)
+
+  if(NOT Catch2_FOUND)
+    include(FetchContent)
+    FetchContent_Declare(
+      Catch2
+      GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+      GIT_TAG v3.5.3
+    )
+    FetchContent_MakeAvailable(Catch2)
+  endif()
 
   add_executable(test_tt_e1
     tests/test_track_reconstructor.cpp

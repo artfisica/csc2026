@@ -46,14 +46,22 @@ struct ParticlesSoA {
 
     double sumEnergy() const {
         double sum = 0.0;
+
+        // Prevent GCC/Clang from turning pow(x, 2) into x*x at -O3.
+        // We keep the math identical (still exponent 2.0), but make it a runtime value.
+        static volatile double two = 2.0;
+        const double exp = two;
+
         for (size_t i = 0; i < px.size(); ++i) {
-            // Intentionally slow: std::pow is expensive and blocks vectorization.
-            const double p2 = std::pow(px[i], 2) + std::pow(py[i], 2) + std::pow(pz[i], 2);
-            sum += std::sqrt(p2 + std::pow(mass[i], 2));
+            const double p2 =
+                std::pow(px[i], exp) +
+                std::pow(py[i], exp) +
+                std::pow(pz[i], exp);
+
+            sum += std::sqrt(p2 + std::pow(mass[i], exp));
         }
         return sum;
     }
 };
 
 } // namespace sd_e2
-
