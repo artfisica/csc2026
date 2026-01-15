@@ -59,7 +59,7 @@ for event in tree:
 
         # Loop over photons
         for j in range(tree.photon_n):
-            if (tree.photon_isTightID[j] and tree.photon_pt[j] > 25000 and
+            if (tree.photon_isTightID[j] and tree.photon_pt[j] > 20000 and
                 (TMath.Abs(tree.photon_eta[j]) < 2.37) and
                 (TMath.Abs(tree.photon_eta[j]) < 1.37 or TMath.Abs(tree.photon_eta[j]) > 1.52)):
 
