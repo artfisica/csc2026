@@ -2,7 +2,7 @@
 
 High-Performance Computing patterns for HEP style analysis: correctness first, then parallelism, then performance.
 
-**Course timetable / Indico:** https://indico.cern.ch/event/1551289/timetable/
+**Course timetable / Indico:** https://indico.cern.ch/event/1551289/timetable/  
 
 [![CI](https://github.com/artfisica/csc2026/actions/workflows/ci.yml/badge.svg)](https://github.com/artfisica/csc2026/actions/workflows/ci.yml)
 
@@ -13,6 +13,8 @@ High-Performance Computing patterns for HEP style analysis: correctness first, t
 This repo is a **teaching codebase** used in lectures and demos, plus **self-contained exercise mini-projects** under `exercises/` (each one has its own `CMakeLists.txt` and a `starter/` folder).
 
 It targets **modern C++ (C++17)**, ROOT-based workflows (via container/devcontainer), and a “measure + verify” mindset.
+
+**Documentation:** https://artfisica.github.io/csc2026/
 
 ---
 
