@@ -15,9 +15,10 @@ std::vector<Track> TrackReconstructor::reconstruct() {
     // Allocate a temporary buffer and forget to delete it.
     Hit* hitBuffer = new Hit[m_hits.size()];
 
+    // 0112_1835-bug identified by sanitizer
     // BUG 2: Heap Buffer Overflow
     // Off-by-one error: i <= size() writes one element past the allocation.
-    for (size_t i = 0; i <= m_hits.size(); ++i) {
+    for (size_t i = 0; i < m_hits.size(); ++i) {
         hitBuffer[i] = m_hits[i];
     }
 
@@ -30,6 +31,9 @@ std::vector<Track> TrackReconstructor::reconstruct() {
     }
 
     // Missing: delete[] hitBuffer;
+    
+    // 0112_1844 fix, deleting hitBuffer to prevent memory leak
+    delete[] hitBuffer;
 
     return tracks;
 }
@@ -37,13 +41,22 @@ std::vector<Track> TrackReconstructor::reconstruct() {
 // BUG 3: Use-After-Free
 // Return a pointer to memory that has already been freed.
 const Track* TrackReconstructor::getBestTrack() const {
-    auto* best = new Track{};
-    best->pt = 100.0;
-    best->hits = m_hits;
+    // using new creates in the heap and it needs to be deleted manually
+    //auto* best = new Track{};
 
-    delete best;   // freed here
-    return best;   // ERROR: returning freed pointer
+    // 0112_2355-fix, changed to static to extend lifetime
+    static Track best{}; // static extends lifetime to program duration
+
+    best.pt = 100.0;
+    best.hits = m_hits;
+
+    // delete best;   // freed here, but we can't because we need it
+    // return best;   // ERROR: returning freed pointer
+
+    return &best; // why &: return address of static object
 }
 
 } // namespace tt_e1
+
+
 
