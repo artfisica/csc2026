@@ -11,13 +11,10 @@ void TrackReconstructor::addHit(const Hit& hit) { m_hits.push_back(hit); }
 std::vector<Track> TrackReconstructor::reconstruct() {
     std::vector<Track> tracks;
 
-    // BUG 1: Memory Leak
-    // Allocate a temporary buffer and forget to delete it.
     Hit* hitBuffer = new Hit[m_hits.size()];
 
-    // BUG 2: Heap Buffer Overflow
-    // Off-by-one error: i <= size() writes one element past the allocation.
-    for (size_t i = 0; i <= m_hits.size(); ++i) {
+    // FIX 2: Heap Buffer Overflow (i < m_hits.size())
+    for (size_t i = 0; i < m_hits.size(); ++i) {
         hitBuffer[i] = m_hits[i];
     }
 
@@ -29,7 +26,9 @@ std::vector<Track> TrackReconstructor::reconstruct() {
         tracks.push_back(t);
     }
 
-    // Missing: delete[] hitBuffer;
+    // FIX 1: Memory Leak (delete[] hitBuffer)
+    delete[] hitBuffer;
+    
 
     return tracks;
 }
@@ -41,7 +40,7 @@ const Track* TrackReconstructor::getBestTrack() const {
     best->pt = 100.0;
     best->hits = m_hits;
 
-    delete best;   // freed here
+    // delete best;   // freed here
     return best;   // ERROR: returning freed pointer
 }
 
